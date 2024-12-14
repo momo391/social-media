@@ -3,7 +3,7 @@ import { z } from "zod";
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/;
 
-export const formSchema = z
+export const signUpSchema = z
   .object({
     first_name: z
       .string()
