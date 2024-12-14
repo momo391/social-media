@@ -1,7 +1,11 @@
+import { AuthTest } from "@/components/test/auth";
+
 export default function Page() {
   return (
     <>
-      <p className="text-8xl capitalize font-bold text-center">outfit</p>
+      <div className="min-h-screen grid place-items-center">
+        <AuthTest />
+      </div>
     </>
   );
 }
