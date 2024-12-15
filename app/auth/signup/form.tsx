@@ -45,8 +45,10 @@ export const SignUpForm = () => {
     console.log(values);
     setLoading(true);
     const { err }: SignUpResult = await signup(values);
-    if (err === undefined) setLoading(false);
-    else {
+    if (err === undefined) {
+      setLoading(false);
+      redirect("/");
+    } else {
       console.log("err :", err);
       redirect("/error");
     }
