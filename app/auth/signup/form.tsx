@@ -16,9 +16,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+import { Icon } from "@iconify/react";
+
 import Link from "next/link";
 
 import { signUpSchema } from "./schema";
+import { useState } from "react";
+import { signup, SignUpResult } from "./actions";
+import { NeonDbError } from "@neondatabase/serverless";
+import { redirect } from "next/navigation";
 
 export const SignUpForm = () => {
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -32,8 +39,17 @@ export const SignUpForm = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof signUpSchema>) {
+  const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState<SignUpResult>();
+  async function onSubmit(values: z.infer<typeof signUpSchema>) {
     console.log(values);
+    setLoading(true);
+    const { err }: SignUpResult = await signup(values);
+    if (err === undefined) setLoading(false);
+    else {
+      console.log("err :", err);
+      redirect("/error");
+    }
   }
 
   return (
@@ -119,7 +135,12 @@ export const SignUpForm = () => {
               already have an account ?
             </Link>
 
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? (
+                <Icon icon="tabler:loader-2" className="animate-spin" />
+              ) : null}
+              Submit
+            </Button>
           </div>
         </form>
       </Form>

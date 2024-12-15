@@ -18,7 +18,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-import { logInSchema } from "./actions";
+import { logInSchema } from "./schema";
 
 export const LogInForm = () => {
   const form = useForm<z.infer<typeof logInSchema>>({
