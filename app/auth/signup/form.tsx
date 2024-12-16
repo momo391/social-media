@@ -32,6 +32,7 @@ export const SignUpForm = () => {
     defaultValues: {
       first_name: "",
       last_name: "",
+      username: "",
       email: "",
       password: "",
       confirm_password: "",
@@ -87,6 +88,20 @@ export const SignUpForm = () => {
               )}
             />
           </div>
+
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Usernanme</FormLabel>
+                <FormControl>
+                  <Input placeholder="John doe" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}

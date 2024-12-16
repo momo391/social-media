@@ -21,6 +21,10 @@ export const signUpSchema = z
         message:
           "Last name can only contain letters, spaces, hyphens, and apostrophes",
       }),
+    username: z
+      .string()
+      .min(2, "username required")
+      .max(50, "username must be at most 50 letters"),
     email: z
       .string()
       .min(1, "email required")

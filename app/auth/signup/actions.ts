@@ -14,9 +14,11 @@ export const signup = async (
 ): Promise<SignUpResult> => {
   try {
     const user: User = {
+      last_name: values.last_name,
+      first_name: values.first_name,
+      username: values.username,
       email: values.email,
       password: await hashPassword(values.password),
-      username: `${values.last_name} ${values.first_name}`,
     };
 
     console.log("user: ", user);
