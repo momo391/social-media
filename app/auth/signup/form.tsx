@@ -22,10 +22,9 @@ import { Icon } from "@iconify/react";
 import Link from "next/link";
 
 import { signUpSchema } from "./schema";
-import { useState } from "react";
-import { signup, SignUpResult } from "./actions";
-import { NeonDbError } from "@neondatabase/serverless";
-import { redirect } from "next/navigation";
+import { useRef, useState } from "react";
+import { signup } from "./actions";
+import { toast } from "@/hooks/use-toast";
 
 export const SignUpForm = () => {
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -39,19 +38,20 @@ export const SignUpForm = () => {
     },
   });
 
+  const { setError } = form;
+
   const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState<SignUpResult>();
   async function onSubmit(values: z.infer<typeof signUpSchema>) {
     console.log(values);
     setLoading(true);
-    const { err }: SignUpResult = await signup(values);
-    if (err === undefined) {
-      setLoading(false);
-      redirect("/");
-    } else {
-      console.log("err :", err);
-      redirect("/error");
-    }
+    const { severity, detail, constraint } = await signup(values);
+    setLoading(false);
+
+    if (constraint === "users_username_unique")
+      setError("root", { type: "deps", message: "username already used" });
+
+    alert(detail);
+    alert(constraint);
   }
 
   return (

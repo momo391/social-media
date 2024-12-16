@@ -9,59 +9,6 @@ import { createSession, generateSessionToken } from "@/lib/server/session";
 import { setSessionTokenCookie } from "@/lib/server/cookies";
 import { NeonDbError } from "@neondatabase/serverless";
 
-// export const signup = async (
-//   values: z.infer<typeof signUpSchema>
-// ): Promise<RegisterError> => {
-//   try {
-//     const user: User = {
-//       email: values.email,
-//       password: await hashPassword(values.password),
-//       username: `${values.first_name} ${values.last_name}`,
-//     };
-
-//     console.log("created");
-
-//     // const result = await db.insert(userTable).values(user).returning({
-//     //   user_id: userTable.id,
-//     // });
-//     // if (result.length < 1)
-//     //   return {
-//     //     where: "result length lower than 1",
-//     //     message: "Something went wrong",
-//     //   };
-
-//     // const { user_id } = result[0];
-
-//     // const token: string = generateSessionToken();
-//     // const session: Session = await createSession(token, user_id);
-//     // if (!session)
-//     //   return {
-//     //     where: "session creation",
-//     //     message: "Something went wrong",
-//     //   };
-//     // setSessionTokenCookie(user_id, session.expires_at);
-//   } catch (err) {
-//     if (err instanceof NeonDbError) {
-//       return {
-//         severity: err?.severity,
-//         code: err?.code,
-//         constraint: err?.constraint,
-//         where: err?.where,
-//       };
-//     } else
-//       return {
-//         where: "err not instanceof NeonDbError",
-//         message: "Something went wrong",
-//       };
-//   }
-
-//   return {
-//     severity: undefined,
-//     code: undefined,
-//     constraint: undefined,
-//   };
-// };
-
 export const signup = async (
   values: z.infer<typeof signUpSchema>
 ): Promise<SignUpResult> => {
@@ -89,16 +36,28 @@ export const signup = async (
 
     await setSessionTokenCookie(token, session.expires_at);
     return {
-      err: undefined,
+      severity: undefined,
+      detail: undefined,
+      constraint: undefined,
     };
   } catch (err) {
     if (err instanceof NeonDbError) {
       console.log("err: ", err);
-      return { err };
+      return {
+        severity: err?.severity,
+        detail: err?.detail,
+        constraint: err?.constraint,
+      };
     }
+    return {
+      severity: "ERROR",
+      detail: "Something went wrong",
+    };
   }
-
-  return { err: undefined };
 };
 
-export type SignUpResult = { err: undefined } | { err: NeonDbError };
+export type SignUpResult = {
+  severity: string | undefined;
+  detail: string | undefined;
+  constraint?: string | undefined;
+};
