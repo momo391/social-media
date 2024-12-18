@@ -46,20 +46,21 @@ export const signup = async (
     if (err instanceof NeonDbError) {
       console.log("err: ", err);
       return {
+        code: err?.code,
         severity: err?.severity,
         detail: err?.detail,
         constraint: err?.constraint,
       };
     }
     return {
-      severity: "ERROR",
-      detail: "Something went wrong",
+      code: "SERVER ERR",
     };
   }
 };
 
 export type SignUpResult = {
-  severity: string | undefined;
-  detail: string | undefined;
+  severity?: string | undefined;
+  detail?: string | undefined;
   constraint?: string | undefined;
+  code?: string | undefined;
 };

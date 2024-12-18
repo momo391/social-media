@@ -25,6 +25,7 @@ import { signUpSchema } from "./schema";
 import { useRef, useState } from "react";
 import { signup } from "./actions";
 import { toast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 export const SignUpForm = () => {
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -45,14 +46,20 @@ export const SignUpForm = () => {
   async function onSubmit(values: z.infer<typeof signUpSchema>) {
     console.log(values);
     setLoading(true);
-    const { severity, detail, constraint } = await signup(values);
+    const { constraint, code } = await signup(values);
     setLoading(false);
 
-    if (constraint === "users_username_unique")
-      setError("root", { type: "deps", message: "username already used" });
+    if (constraint === "users_email_unique")
+      setError("email", { type: "deps", message: "email already used" });
 
-    alert(detail);
-    alert(constraint);
+    if (constraint === "users_username_unique")
+      setError("username", { type: "deps", message: "username already used" });
+
+    if (code && constraint === undefined)
+      toast({
+        title: code,
+        description: "Something went wrong",
+      });
   }
 
   return (
