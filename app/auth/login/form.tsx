@@ -17,10 +17,16 @@ import { Input } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { Icon } from "@iconify/react";
 
 import { logInSchema } from "./schema";
+import { useState } from "react";
+import { login, LogInResult } from "./actions";
+import { toast } from "@/hooks/use-toast";
+import { redirect } from "next/navigation";
 
 export const LogInForm = () => {
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof logInSchema>>({
     resolver: zodResolver(logInSchema),
     defaultValues: {
@@ -28,9 +34,23 @@ export const LogInForm = () => {
       password: "",
     },
   });
+  const { setError } = form;
 
-  function onSubmit(values: z.infer<typeof logInSchema>) {
+  async function onSubmit(values: z.infer<typeof logInSchema>) {
     console.log(values);
+
+    setLoading(true);
+    const { where, message }: LogInResult = await login(values);
+    setLoading(false);
+
+    if (where === "password" || where === "email")
+      setError(where, { type: "deps", message });
+    else if (where === "Database" || where === "Server")
+      toast({
+        title: where,
+        description: message,
+      });
+    else redirect("/");
   }
 
   return (
@@ -73,7 +93,12 @@ export const LogInForm = () => {
               don't have an account ?
             </Link>
 
-            <Button type="submit">log in</Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? (
+                <Icon icon="tabler:loader-2" className="animate-spin" />
+              ) : null}
+              log in
+            </Button>
           </div>
         </form>
       </Form>
