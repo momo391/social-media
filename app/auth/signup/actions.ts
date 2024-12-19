@@ -21,46 +21,46 @@ export const signup = async (
       password: await hashPassword(values.password),
     };
 
-    console.log("user: ", user);
-
     const result = await db.insert(userTable).values(user).returning({
       user_id: userTable.id,
     });
 
     const { user_id } = result[0];
-    console.log("user id:", user_id);
-
     const token: string = generateSessionToken();
-    console.log("token: ", token);
-
     const session: Session = await createSession(token, user_id);
-    console.log("session :", session);
 
     await setSessionTokenCookie(token, session.expires_at);
     return {
-      severity: undefined,
-      detail: undefined,
-      constraint: undefined,
+      where: null,
+      message: null,
     };
   } catch (err) {
     if (err instanceof NeonDbError) {
       console.log("err: ", err);
-      return {
-        code: err?.code,
-        severity: err?.severity,
-        detail: err?.detail,
-        constraint: err?.constraint,
-      };
+
+      if (err?.constraint === "users_email_unique")
+        return {
+          where: "email",
+          message: "email already used",
+        };
+      if (err?.constraint === "users_username_unique")
+        return {
+          where: "username",
+          message: "username already used",
+        };
+      else
+        return {
+          where: "Database",
+          message: "Something went wrong",
+        };
     }
     return {
-      code: "SERVER ERR",
+      where: "Server",
+      message: "something went wrong",
     };
   }
 };
 
-export type SignUpResult = {
-  severity?: string | undefined;
-  detail?: string | undefined;
-  constraint?: string | undefined;
-  code?: string | undefined;
-};
+export type SignUpResult =
+  | { where: string; message: string }
+  | { where: null; message: null };

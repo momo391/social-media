@@ -22,10 +22,10 @@ import { Icon } from "@iconify/react";
 import Link from "next/link";
 
 import { signUpSchema } from "./schema";
-import { useRef, useState } from "react";
-import { signup } from "./actions";
+import { useState } from "react";
+import { signup, SignUpResult } from "./actions";
 import { toast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+import { redirect } from "next/navigation";
 
 export const SignUpForm = () => {
   const form = useForm<z.infer<typeof signUpSchema>>({
@@ -46,20 +46,17 @@ export const SignUpForm = () => {
   async function onSubmit(values: z.infer<typeof signUpSchema>) {
     console.log(values);
     setLoading(true);
-    const { constraint, code } = await signup(values);
+    const { where, message }: SignUpResult = await signup(values);
     setLoading(false);
 
-    if (constraint === "users_email_unique")
-      setError("email", { type: "deps", message: "email already used" });
-
-    if (constraint === "users_username_unique")
-      setError("username", { type: "deps", message: "username already used" });
-
-    if (code && constraint === undefined)
+    if (where === "username" || where === "email")
+      setError(where, { type: "deps", message });
+    else if (where === "Database" || where === "Server")
       toast({
-        title: code,
-        description: "Something went wrong",
+        title: where,
+        description: message,
       });
+    else redirect("/");
   }
 
   return (
